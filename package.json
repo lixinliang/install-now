@@ -1,0 +1,22 @@
+{
+  "name": "install-now-monorepo",
+  "private": true,
+  "engines": {
+    "node": ">=22.20.0"
+  },
+  "packageManager": "pnpm@9.8.0",
+  "description": "Monorepo for install-now and i-now packages",
+  "scripts": {
+    "build": "pnpm -r --filter=./packages/* run build",
+    "clean": "pnpm -r --filter=./packages/* run clean",
+    "release": "lerna publish --no-private",
+    "prepare": "pnpm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "lerna": "^8.0.0",
+    "tsc-alias": "^1.8.10",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0"
+  }
+}

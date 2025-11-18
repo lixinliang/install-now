@@ -1,0 +1,14 @@
+{
+  "version": "independent",
+  "npmClient": "pnpm",
+  "packages": [
+    "packages/install-now",
+    "packages/i-now"
+  ],
+  "command": {
+    "publish": {
+      "conventionalCommits": true
+    }
+  }
+}
+
