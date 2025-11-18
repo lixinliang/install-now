@@ -9,7 +9,7 @@
   "scripts": {
     "build": "pnpm -r --filter=./packages/* run build",
     "clean": "pnpm -r --filter=./packages/* run clean",
-    "publish": "lerna publish",
+    "release": "lerna publish --no-private",
     "prepare": "pnpm run build"
   },
   "devDependencies": {

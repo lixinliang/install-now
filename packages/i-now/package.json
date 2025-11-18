@@ -1,6 +1,6 @@
 {
   "name": "i-now",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Smart dependency installer - automatically detects package manager and installs dependencies (short alias)",
   "type": "module",
   "main": "./dist/index.cjs",

@@ -1,0 +1,148 @@
+# install-now / i-now 项目上下文
+
+## 项目背景
+
+这是一个 monorepo 项目，用于创建智能安装依赖的 CLI 工具。项目包含两个 npm 包：
+- `install-now` - 完整名称
+- `i-now` - 简短别名
+
+两个包共享相同的核心代码（在 `packages/core` 中），只是包名和 bin 命令不同。
+
+## 核心需求
+
+1. **自动检测 node_modules**：如果存在则跳过，不存在则安装
+2. **智能包管理器检测**：
+   - 优先从 lock 文件检测（bun.lockb, pnpm-lock.yaml, yarn.lock, package-lock.json）
+   - 其次从 package.json 的 packageManager 字段检测
+   - 最后按优先级检测系统中可用的包管理器
+3. **智能命令选择**：
+   - 有 lock 文件 → 使用 `ci` 命令（npm/pnpm/yarn）或 `install`（bun）
+   - 没有 lock 文件 → 使用 `install` 命令
+4. **支持的包管理器**：bun, pnpm, yarn, cnpm, npm（按优先级）
+
+## 技术决策
+
+### 为什么选择这个逻辑？
+
+- `ci` 命令需要 lock 文件，确保安装的一致性（适合 CI/CD）
+- `install` 命令更灵活，可以生成 lock 文件（适合首次安装）
+- 这个设计平衡了严格性和灵活性
+
+### 为什么使用 monorepo？
+
+- 两个包共享相同的核心代码
+- 便于维护和版本管理
+- 使用 lerna 可以统一发布
+
+### 为什么 core 包是 private？
+
+- core 包只是内部实现，不应该被外部直接使用
+- 只有 install-now 和 i-now 包应该被发布
+
+## 项目结构
+
+```
+install-now/
+├── package.json              # 根配置，使用 pnpm workspace
+├── pnpm-workspace.yaml       # workspace 配置
+├── lerna.json               # lerna 配置（版本管理）
+├── tsconfig.json            # TypeScript 配置
+├── packages/
+│   ├── core/                # 核心代码（private）
+│   │   ├── package.json     # name: "@i-now/core", private: true
+│   │   ├── src/index.ts     # 核心逻辑实现
+│   │   └── dist/            # 编译输出
+│   ├── install-now/         # install-now 包
+│   │   ├── package.json     # name: "install-now"
+│   │   └── bin/install-now.js  # 入口文件，引用 @i-now/core
+│   └── i-now/               # i-now 包（短别名）
+│       ├── package.json     # name: "i-now"
+│       └── bin/i-now.js     # 入口文件，引用 @i-now/core
+```
+
+## 关键实现点
+
+### 1. 包管理器检测
+
+```typescript
+// 从 lock 文件检测
+function detectPackageManagerFromLockFiles(cwd: string)
+
+// 检测命令是否可用
+async function isCommandAvailable(command: string)
+
+// 按优先级查找可用的包管理器
+async function findAvailablePackageManager(cwd: string)
+```
+
+### 2. 安装命令选择
+
+```typescript
+// 根据包管理器和是否有 lock 文件选择命令
+function getInstallCommand(packageManager: string, hasLockFile: boolean)
+// 返回: { cmd: string, args: string[] }
+```
+
+### 3. 主函数
+
+```typescript
+export async function runCommand()
+// 1. 检查 node_modules
+// 2. 检测包管理器
+// 3. 选择安装命令
+// 4. 执行安装
+```
+
+## 依赖关系
+
+- **core 包**：
+  - execa: 执行子进程命令
+  - node:fs: 文件系统操作
+  - node:path: 路径处理
+
+- **install-now / i-now 包**：
+  - @i-now/core: workspace 依赖
+
+## 构建和发布
+
+### 构建流程
+
+1. 编译 core 包（TypeScript → JavaScript）
+2. install-now 和 i-now 包引用编译后的 core 包
+
+### 发布流程
+
+使用 lerna 管理版本和发布：
+- 可以独立发布每个包
+- 可以统一发布所有包
+- 支持版本管理
+
+## 使用场景
+
+### 在模板项目中使用
+
+```json
+{
+  "scripts": {
+    "predev": "npx i-now",
+    "dev": "your-dev-command"
+  }
+}
+```
+
+这样当用户首次运行 `npm run dev` 时，会自动检查并安装依赖。
+
+## 注意事项
+
+1. **跨平台兼容性**：使用 Node.js 原生 API，确保跨平台
+2. **错误处理**：需要友好的错误提示
+3. **性能**：检测过程应该快速（文件系统操作）
+4. **用户体验**：清晰的输出信息
+
+## 未来扩展
+
+- 支持配置文件自定义优先级
+- 支持静默模式
+- 更好的错误处理和重试机制
+- 支持更多包管理器
+

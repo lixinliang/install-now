@@ -2,7 +2,8 @@
   "version": "independent",
   "npmClient": "pnpm",
   "packages": [
-    "packages/*"
+    "packages/install-now",
+    "packages/i-now"
   ],
   "command": {
     "publish": {
