@@ -1,0 +1,49 @@
+{
+  "name": "install-now",
+  "version": "0.0.1",
+  "description": "Smart dependency installer - automatically detects package manager and installs dependencies",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "bin": {
+    "install-now": "./bin/install-now.js"
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "scripts": {
+    "build": "pnpm clean && pnpm run tsc && vite build",
+    "clean": "rm -rf ./dist",
+    "tsc": "tsc && tsc-alias"
+  },
+  "devDependencies": {
+    "core": "workspace:*"
+  },
+  "engines": {
+    "node": ">=16.13.0"
+  },
+  "keywords": [
+    "install",
+    "dependencies",
+    "package-manager",
+    "npm",
+    "yarn",
+    "pnpm",
+    "cnpm",
+    "bun"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  }
+}
