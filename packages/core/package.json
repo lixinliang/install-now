@@ -1,0 +1,28 @@
+{
+  "name": "core",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Core logic for install-now and i-now",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "pnpm clean && pnpm run tsc && vite build",
+    "clean": "rm -rf ./dist",
+    "tsc": "tsc && tsc-alias"
+  },
+  "engines": {
+    "node": ">=16.13.0"
+  },
+  "devDependencies": {
+    "execa": "^8.0.0"
+  }
+}
